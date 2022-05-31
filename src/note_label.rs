@@ -15,7 +15,7 @@ impl NoteLabel{
         let notes_labels = query_as!(NoteLabel, r#"SELECT id, note_id, label_id FROM notes_labels"#)
             .fetch_all(pool.get_ref())
             .await?;
-        Ok(labels)
+        Ok(notes_labels)
     }
 
     pub async fn get(pool: web::Data<SqlitePool>, id: i64) -> Result<NoteLabel, Error>{

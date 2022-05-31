@@ -1,7 +1,7 @@
 use actix_web::{get, post, web, Error, HttpResponse, http::StatusCode};
 use anyhow::Result;
 use sqlx::SqlitePool;
-use crate::joke::Note;
+use crate::note::Note;
 
 #[get("/")]
 pub async fn root() -> Result<HttpResponse, Error>{

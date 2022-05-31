@@ -2,6 +2,13 @@ mod note;
 mod label;
 mod category;
 mod note_label;
+mod routes;
+
+use sqlx::sqlite::SqlitePoolOptions;
+use actix_web::{App, HttpServer};
+use dotenv::dotenv;
+use std::env;
+use crate::routes::{root, all_notes};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -16,9 +23,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .data(pool.clone())
             .service(root)
-            .service(all_jokes)
-            .service(get_joke)
-            .service(get_random_joke)
+            .service(all_notes)
     })
     .bind("127.0.0.1:8080")
     .unwrap()

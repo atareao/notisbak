@@ -2,7 +2,6 @@ use actix_web::web;
 use chrono::NaiveDateTime;
 use sqlx::{sqlite::SqlitePool, query, query_as, FromRow, Error};
 use serde::{Serialize, Deserialize};
-use rand::Rng;
 
 #[derive(Debug, FromRow, Serialize, Deserialize)]
 #[serde(rename_all="camelCase")]
@@ -25,13 +24,13 @@ pub struct NewNote{
 impl Note{
     pub async fn all(pool: web::Data<SqlitePool>) -> Result<Vec<Note>, Error>{
         let notes = query_as!(Note, r#"SELECT id, title, body, category_id, created_at, updated_at FROM notes"#)
-            .fech_all(pool.get_ref())
+            .fetch_all(pool.get_ref())
             .await?;
         Ok(notes)
     }
 
     pub async fn get(pool: web::Data<SqlitePool>, id: i64) -> Result<Note, Error>{
-        let note = query_as!(Note, r#"SELECT id, title, body, category_id, updated_at FROM notes WHERE id=$1"#, id)
+        let note = query_as!(Note, r#"SELECT id, title, body, category_id, created_at, updated_at FROM notes WHERE id=$1"#, id)
             .fetch_one(pool.get_ref())
             .await?;
         Ok(note)
