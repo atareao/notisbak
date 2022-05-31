@@ -50,5 +50,3 @@ impl Note{
         Ok(Self::get(pool, id).await?)
     }
 }
-
-}
