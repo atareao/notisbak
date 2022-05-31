@@ -78,7 +78,7 @@
     },
     "query": "SELECT id, name FROM categories"
   },
-  "81f9296174ef6099a2a4a54ae3d50304b156e580276e2a2cd80ab1e54c7ae4fb": {
+  "380e83a5c71595c505ab1e5e0d51a7399d7c235281423e67fc011bac657f5f70": {
     "describe": {
       "columns": [
         {
@@ -97,23 +97,17 @@
           "type_info": "Text"
         },
         {
-          "name": "category_id",
-          "ordinal": 3,
-          "type_info": "Int64"
-        },
-        {
           "name": "created_at",
-          "ordinal": 4,
+          "ordinal": 3,
           "type_info": "Datetime"
         },
         {
           "name": "updated_at",
-          "ordinal": 5,
+          "ordinal": 4,
           "type_info": "Datetime"
         }
       ],
       "nullable": [
-        false,
         false,
         false,
         false,
@@ -124,7 +118,49 @@
         "Right": 0
       }
     },
-    "query": "SELECT id, title, body, category_id, created_at, updated_at FROM notes"
+    "query": "SELECT id, title, body, created_at, updated_at FROM notes"
+  },
+  "875031e5e9f4c96520aed7a2380fed56b7e44bef1c6e36813259ccd06b8e2e50": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "title",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "body",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 3,
+          "type_info": "Datetime"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 4,
+          "type_info": "Datetime"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT id, title, body, created_at, updated_at FROM notes WHERE id=$1"
   },
   "8f63b0aaa6692a686b6b9a0501fa99cc963f962fe5825649eba75de29a43c8c7": {
     "describe": {
@@ -155,54 +191,6 @@
       }
     },
     "query": "SELECT id, note_id, label_id FROM notes_labels"
-  },
-  "b930e197a9570d8285cfc0d252635643c6b717d4c21978912c07a53ceb362420": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int64"
-        },
-        {
-          "name": "title",
-          "ordinal": 1,
-          "type_info": "Text"
-        },
-        {
-          "name": "body",
-          "ordinal": 2,
-          "type_info": "Text"
-        },
-        {
-          "name": "category_id",
-          "ordinal": 3,
-          "type_info": "Int64"
-        },
-        {
-          "name": "created_at",
-          "ordinal": 4,
-          "type_info": "Datetime"
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 5,
-          "type_info": "Datetime"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "SELECT id, title, body, category_id, created_at, updated_at FROM notes WHERE id=$1"
   },
   "f5d953006920b310d2eb9838f91f77a0cf2c669b76b730b8b9e672539cd40cc7": {
     "describe": {
