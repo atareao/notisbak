@@ -9,6 +9,12 @@ pub struct Label{
     pub name: String,
 }
 
+#[derive(Debug, FromRow, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct NewCategory{
+    pub name: String,
+}
+
 impl Label{
     pub async fn all(pool: web::Data<SqlitePool>) -> Result<Vec<Label>, Error>{
         let labels = query_as!(Label, r#"SELECT id, name FROM labels"#)
