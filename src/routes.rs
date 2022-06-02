@@ -19,7 +19,7 @@ pub async fn all_notes(pool: web::Data<SqlitePool>) -> Result<HttpResponse, Erro
 }
 
 #[post("/notes")]
-pub async fn new_joke(pool: web::Data<SqlitePool>, data: web::Json<NewNote>) -> Result<HttpResponse, Error>{
+pub async fn new_note(pool: web::Data<SqlitePool>, data: web::Json<NewNote>) -> Result<HttpResponse, Error>{
     Ok(Note::new(pool, &data.into_inner().title)
        .await
        .map(|note| HttpResponse::Ok().json(note))
