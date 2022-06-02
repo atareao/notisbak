@@ -1,5 +1,5 @@
 use actix_web::web;
-use chrono::NaiveDateTime;
+use chrono::{NaiveDateTime, Utc};
 use sqlx::{sqlite::SqlitePool, query, query_as, FromRow, Error};
 use serde::{Serialize, Deserialize};
 
@@ -36,8 +36,8 @@ impl Note{
 
     pub async fn new(pool: web::Data<SqlitePool>, title: &str) -> Result<Note, Error>{
         let body = "";
-        let created_at = 0;
-        let updated_at = 0;
+        let created_at = Utc::now().naive_utc();
+        let updated_at = Utc::now().naive_utc();
         let id = query("INSERT INTO notes (title, body, created_at, updated_at) VALUES (?, ?, ?, ?);")
             .bind(title)
             .bind(body)
