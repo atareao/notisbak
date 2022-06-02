@@ -4,7 +4,6 @@ use sqlx::{sqlite::SqlitePool, query, query_as, FromRow, Error};
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, FromRow, Serialize, Deserialize)]
-#[serde(rename_all="camelCase")]
 pub struct Note{
     pub id: i64,
     pub title: String,
@@ -14,9 +13,14 @@ pub struct Note{
 }
 
 #[derive(Debug, FromRow, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct NewNote{
     pub title: String,
+}
+
+#[derive(Debug, FromRow, Serialize, Deserialize)]
+pub struct UpdateNote{
+    pub title: String,
+    pub body: String,
 }
 
 impl Note{
@@ -46,6 +50,18 @@ impl Note{
             .execute(pool.get_ref())
             .await?
             .last_insert_rowid();
+        Ok(Self::get(pool, id).await?)
+    }
+
+    pub async fn update(pool: web::Data<SqlitePool>, id:i64, title: Option<&str>, body: Option<&str>) -> Result<Note, Error>{
+        let updated_at = Utc::now().naive_utc();
+        query("UPDATE notes SET title=?, body=?, updated_at=? WHERE id=?;")
+            .bind(title)
+            .bind(body)
+            .bind(updated_at)
+            .bind(id)
+            .execute(pool.get_ref())
+            .await?;
         Ok(Self::get(pool, id).await?)
     }
 }

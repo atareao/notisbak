@@ -1,7 +1,7 @@
-use actix_web::{get, post, web, Error, HttpResponse, http::StatusCode};
+use actix_web::{get, post, put, web, Error, HttpResponse, http::StatusCode};
 use anyhow::Result;
 use sqlx::SqlitePool;
-use crate::note::{Note, NewNote};
+use crate::note::{Note, NewNote, UpdateNote};
 use crate::category::{Category, NewCategory};
 use crate::label::{Label, NewLabel};
 
@@ -21,6 +21,15 @@ pub async fn all_notes(pool: web::Data<SqlitePool>) -> Result<HttpResponse, Erro
 #[post("/notes")]
 pub async fn new_note(pool: web::Data<SqlitePool>, data: web::Json<NewNote>) -> Result<HttpResponse, Error>{
     Ok(Note::new(pool, &data.into_inner().title)
+       .await
+       .map(|note| HttpResponse::Ok().json(note))
+       .map_err(|_| HttpResponse::InternalServerError())?)
+}
+
+#[put("/notes")]
+pub async fn update_note(pool: web::Data<SqlitePool>, data: web::Json<UpdateNote>) -> Result<HttpResponse, Error>{
+    Ok(Note::update(pool, &data.into_inner().id, &data.into_inner().title,
+                    &data.into_inner().body)
        .await
        .map(|note| HttpResponse::Ok().json(note))
        .map_err(|_| HttpResponse::InternalServerError())?)
