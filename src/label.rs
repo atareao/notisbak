@@ -11,7 +11,7 @@ pub struct Label{
 
 #[derive(Debug, FromRow, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct NewCategory{
+pub struct NewLabel{
     pub name: String,
 }
 
