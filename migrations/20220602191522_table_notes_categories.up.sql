@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS notes_categories(
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    note_id INTEGER NOT NULL,
+    category_id INTEGER NOT NULL
+);
