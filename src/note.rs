@@ -17,12 +17,6 @@ pub struct NewNote{
     pub title: String,
 }
 
-#[derive(Debug, FromRow, Serialize, Deserialize)]
-pub struct UpdateNote{
-    pub title: String,
-    pub body: String,
-}
-
 impl Note{
     pub async fn all(pool: web::Data<SqlitePool>) -> Result<Vec<Note>, Error>{
         let notes = query_as!(Note, r#"SELECT id, title, body, created_at, updated_at FROM notes"#)
@@ -50,18 +44,18 @@ impl Note{
             .execute(pool.get_ref())
             .await?
             .last_insert_rowid();
-        Ok(Self::get(pool, id).await?)
+        Self::get(pool, id).await
     }
 
-    pub async fn update(pool: web::Data<SqlitePool>, id:i64, title: Option<&str>, body: Option<&str>) -> Result<Note, Error>{
+    pub async fn update(pool: web::Data<SqlitePool>, note: Note) -> Result<Note, Error>{
         let updated_at = Utc::now().naive_utc();
         query("UPDATE notes SET title=?, body=?, updated_at=? WHERE id=?;")
-            .bind(title)
-            .bind(body)
+            .bind(note.title)
+            .bind(note.body)
             .bind(updated_at)
-            .bind(id)
+            .bind(note.id)
             .execute(pool.get_ref())
             .await?;
-        Ok(Self::get(pool, id).await?)
+        Self::get(pool, note.id).await
     }
 }

@@ -36,7 +36,7 @@ impl Label{
             .execute(pool.get_ref())
             .await?
             .last_insert_rowid();
-        Ok(Self::get(pool, id).await?)
+        Self::get(pool, id).await
     }
 }
 

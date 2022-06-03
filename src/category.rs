@@ -3,14 +3,12 @@ use sqlx::{sqlite::SqlitePool, query, query_as, FromRow, Error};
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, FromRow, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Category{
     pub id: i64,
     pub name: String,
 }
 
 #[derive(Debug, FromRow, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct NewCategory{
     pub name: String,
 }
@@ -36,7 +34,7 @@ impl Category{
             .execute(pool.get_ref())
             .await?
             .last_insert_rowid();
-        Ok(Self::get(pool, id).await?)
+        Self::get(pool, id).await
     }
 }
 
