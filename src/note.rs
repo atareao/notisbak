@@ -19,6 +19,7 @@ pub struct NewNote{
 
 impl Note{
     pub async fn all(pool: web::Data<SqlitePool>) -> Result<Vec<Note>, Error>{
+        println!("Get all");
         let notes = query_as!(Note, r#"SELECT id, title, body, created_at, updated_at FROM notes"#)
             .fetch_all(pool.get_ref())
             .await?;

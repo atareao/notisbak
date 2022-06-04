@@ -10,33 +10,23 @@ pub async fn root() -> Result<HttpResponse, Error>{
     Ok(HttpResponse::build(StatusCode::OK).body("Hello world, Rust!"))
 }
 
-// #[get("/notes}")]
-// pub async fn read_all_note(pool: web::Data<SqlitePool>)->Result<HttpResponse, Error>{
-//     Ok(Note::all(pool)
-//        .await
-//        .map(|some_notes| HttpResponse::Ok().json(some_notes))
-//        .map_err(|_| HttpResponse::InternalServerError())?)
-// }
+ #[get("/notes}")]
+ pub async fn read_all_note(pool: web::Data<SqlitePool>)->Result<HttpResponse, Error>{
+     println!("=== Aqui ===");
+     Ok(Note::all(pool)
+        .await
+        .map(|some_notes| HttpResponse::Ok().json(some_notes))
+        .map_err(|_| HttpResponse::InternalServerError())?)
+}
 
 #[get("/notes/{note_id}")]
-pub async fn read_note(pool: web::Data<SqlitePool>, option_path: Option<web::Path<i64>>)->Result<HttpResponse, Error>{
-    match option_path{
-        Some(path) => {
-            let note_id = path.into_inner();
-            println!("=== {} ===", note_id);
-            Ok(Note::get(pool, note_id)
-               .await
-               .map(|note| HttpResponse::Ok().json(note))
-               .map_err(|_| HttpResponse::InternalServerError())?)
-        },
-        None => {
-            println!("=== {} ===", "Nada");
-            Ok(Note::all(pool)
-               .await
-               .map(|some_notes| HttpResponse::Ok().json(some_notes))
-               .map_err(|_| HttpResponse::InternalServerError())?)
-        }
-    }
+pub async fn read_note(pool: web::Data<SqlitePool>, path: web::Path<i64>)->Result<HttpResponse, Error>{
+    let note_id = path.into_inner();
+    println!("=== {} ===", note_id);
+    Ok(Note::get(pool, note_id)
+       .await
+       .map(|note| HttpResponse::Ok().json(note))
+       .map_err(|_| HttpResponse::InternalServerError())?)
 }
 
 #[post("/notes")]
