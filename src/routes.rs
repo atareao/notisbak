@@ -1,4 +1,4 @@
-use actix_web::{get, post, put, web, Error, HttpResponse, http::StatusCode};
+use actix_web::{get, post, put, delete, web, Error, HttpResponse, http::StatusCode};
 use anyhow::Result;
 use sqlx::SqlitePool;
 use crate::note::{Note, NewNote};
@@ -10,17 +10,38 @@ pub async fn root() -> Result<HttpResponse, Error>{
     Ok(HttpResponse::build(StatusCode::OK).body("Hello world, Rust!"))
 }
 
-#[get("/notes")]
-pub async fn all_notes(pool: web::Data<SqlitePool>) -> Result<HttpResponse, Error>{
-    Ok(Note::all(pool)
-       .await
-       .map(|some_notes| HttpResponse::Ok().json(some_notes))
-       .map_err(|_| HttpResponse::InternalServerError())?)
+// #[get("/notes}")]
+// pub async fn read_all_note(pool: web::Data<SqlitePool>)->Result<HttpResponse, Error>{
+//     Ok(Note::all(pool)
+//        .await
+//        .map(|some_notes| HttpResponse::Ok().json(some_notes))
+//        .map_err(|_| HttpResponse::InternalServerError())?)
+// }
+
+#[get("/notes/{note_id}")]
+pub async fn read_note(pool: web::Data<SqlitePool>, option_path: Option<web::Path<i64>>)->Result<HttpResponse, Error>{
+    match option_path{
+        Some(path) => {
+            let note_id = path.into_inner();
+            println!("=== {} ===", note_id);
+            Ok(Note::get(pool, note_id)
+               .await
+               .map(|note| HttpResponse::Ok().json(note))
+               .map_err(|_| HttpResponse::InternalServerError())?)
+        },
+        None => {
+            println!("=== {} ===", "Nada");
+            Ok(Note::all(pool)
+               .await
+               .map(|some_notes| HttpResponse::Ok().json(some_notes))
+               .map_err(|_| HttpResponse::InternalServerError())?)
+        }
+    }
 }
 
 #[post("/notes")]
-pub async fn new_note(pool: web::Data<SqlitePool>, data: web::Json<NewNote>) -> Result<HttpResponse, Error>{
-    Ok(Note::new(pool, &data.into_inner().title)
+pub async fn create_note(pool: web::Data<SqlitePool>, data: web::Json<NewNote>) -> Result<HttpResponse, Error>{
+    Ok(Note::new(pool, &data.into_inner().title, None)
        .await
        .map(|note| HttpResponse::Ok().json(note))
        .map_err(|_| HttpResponse::InternalServerError())?)
@@ -32,6 +53,15 @@ pub async fn update_note(pool: web::Data<SqlitePool>, data: web::Json<Note>) -> 
     Ok(Note::update(pool, note)
        .await
        .map(|note| HttpResponse::Ok().json(note))
+       .map_err(|_| HttpResponse::InternalServerError())?)
+}
+
+#[delete("/notes/{note_id}")]
+pub async fn delete_note(pool: web::Data<SqlitePool>, path: web::Path<i64>)->Result<HttpResponse, Error>{
+    let note_id = path.into_inner();
+    Ok(Note::delete(pool, note_id)
+       .await
+       .map(|message| HttpResponse::Ok().body(message))
        .map_err(|_| HttpResponse::InternalServerError())?)
 }
 

@@ -9,8 +9,8 @@ use sqlx::sqlite::SqlitePoolOptions;
 use actix_web::{App, HttpServer};
 use dotenv::dotenv;
 use std::env;
-use routes::{root, all_notes, new_note, all_categories, new_category,
-                    all_labels, new_label};
+use routes::{root, create_note, read_note, update_note, delete_note,
+             all_categories, new_category, all_labels, new_label};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -25,8 +25,10 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .data(pool.clone())
             .service(root)
-            .service(all_notes)
-            .service(new_note)
+            .service(create_note)
+            .service(read_note)
+            .service(update_note)
+            .service(delete_note)
             .service(all_categories)
             .service(new_category)
             .service(all_labels)
