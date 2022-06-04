@@ -1,4 +1,4 @@
-use actix_web::{get, post, put, delete, web, Error, HttpResponse, http::StatusCode};
+use actix_web::{get, post, put, delete, web, error::ErrorNotFound, Error, HttpResponse, http::StatusCode};
 use anyhow::Result;
 use sqlx::SqlitePool;
 use crate::note::{Note, NewNote};
@@ -13,76 +13,76 @@ pub async fn root() -> Result<HttpResponse, Error>{
  #[get("/notes}")]
  pub async fn read_all_note(pool: web::Data<SqlitePool>)->Result<HttpResponse, Error>{
      println!("=== Aqui ===");
-     Ok(Note::all(pool)
+     Note::all(pool)
         .await
         .map(|some_notes| HttpResponse::Ok().json(some_notes))
-        .map_err(|_| HttpResponse::InternalServerError())?)
+        .map_err(|_| ErrorNotFound("Not found"))
 }
 
-#[get("/notes/{note_id}")]
+//#[get("/notes/{note_id}")]
 pub async fn read_note(pool: web::Data<SqlitePool>, path: web::Path<i64>)->Result<HttpResponse, Error>{
     let note_id = path.into_inner();
     println!("=== {} ===", note_id);
-    Ok(Note::get(pool, note_id)
+    Note::get(pool, note_id)
        .await
        .map(|note| HttpResponse::Ok().json(note))
-       .map_err(|_| HttpResponse::InternalServerError())?)
+       .map_err(|_| ErrorNotFound("Not found"))
 }
 
 #[post("/notes")]
 pub async fn create_note(pool: web::Data<SqlitePool>, data: web::Json<NewNote>) -> Result<HttpResponse, Error>{
-    Ok(Note::new(pool, &data.into_inner().title, None)
+    Note::new(pool, &data.into_inner().title, None)
        .await
        .map(|note| HttpResponse::Ok().json(note))
-       .map_err(|_| HttpResponse::InternalServerError())?)
+       .map_err(|_| ErrorNotFound("Not found"))
 }
 
 #[put("/notes")]
 pub async fn update_note(pool: web::Data<SqlitePool>, data: web::Json<Note>) -> Result<HttpResponse, Error>{
     let note = data.into_inner();
-    Ok(Note::update(pool, note)
+    Note::update(pool, note)
        .await
        .map(|note| HttpResponse::Ok().json(note))
-       .map_err(|_| HttpResponse::InternalServerError())?)
+       .map_err(|_| ErrorNotFound("Not found"))
 }
 
 #[delete("/notes/{note_id}")]
 pub async fn delete_note(pool: web::Data<SqlitePool>, path: web::Path<i64>)->Result<HttpResponse, Error>{
     let note_id = path.into_inner();
-    Ok(Note::delete(pool, note_id)
+    Note::delete(pool, note_id)
        .await
        .map(|message| HttpResponse::Ok().body(message))
-       .map_err(|_| HttpResponse::InternalServerError())?)
+       .map_err(|_| ErrorNotFound("Not found"))
 }
 
 #[get("/categories")]
 pub async fn all_categories(pool: web::Data<SqlitePool>) -> Result<HttpResponse, Error>{
-    Ok(Category::all(pool)
+    Category::all(pool)
        .await
        .map(|some_categories| HttpResponse::Ok().json(some_categories))
-       .map_err(|_| HttpResponse::InternalServerError())?)
+       .map_err(|_| ErrorNotFound("Not found"))
 }
 
 #[post("/categories")]
 pub async fn new_category(pool: web::Data<SqlitePool>, data: web::Json<NewCategory>) -> Result<HttpResponse, Error>{
-    Ok(Category::new(pool, &data.into_inner().name)
+    Category::new(pool, &data.into_inner().name)
        .await
        .map(|category| HttpResponse::Ok().json(category))
-       .map_err(|_| HttpResponse::InternalServerError())?)
+       .map_err(|_| ErrorNotFound("Not found"))
 }
 
 #[get("/labels")]
 pub async fn all_labels(pool: web::Data<SqlitePool>) -> Result<HttpResponse, Error>{
-    Ok(Label::all(pool)
+    Label::all(pool)
        .await
        .map(|some_labels| HttpResponse::Ok().json(some_labels))
-       .map_err(|_| HttpResponse::InternalServerError())?)
+       .map_err(|_| ErrorNotFound("Not found"))
 }
 
 #[post("/labels")]
 pub async fn new_label(pool: web::Data<SqlitePool>, data: web::Json<NewLabel>) -> Result<HttpResponse, Error>{
-    Ok(Label::new(pool, &data.into_inner().name)
+    Label::new(pool, &data.into_inner().name)
        .await
        .map(|label| HttpResponse::Ok().json(label))
-       .map_err(|_| HttpResponse::InternalServerError())?)
+       .map_err(|_| ErrorNotFound("Not found"))
 }

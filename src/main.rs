@@ -6,10 +6,10 @@ mod note_category;
 mod routes;
 
 use sqlx::sqlite::SqlitePoolOptions;
-use actix_web::{App, HttpServer};
+use actix_web::{App, HttpServer, web::Data};
 use dotenv::dotenv;
 use std::env;
-use routes::{root, create_note, read_note, read_all_note, update_note,
+use routes::{root, create_note, read_all_note, update_note,
              delete_note,all_categories, new_category, all_labels, new_label};
 
 #[actix_web::main]
@@ -23,11 +23,11 @@ async fn main() -> std::io::Result<()> {
         .expect("pool failed");
     HttpServer::new(move ||{
         App::new()
-            .data(pool.clone())
+            .app_data(Data::new(pool.clone()))
             .service(root)
+            .service(read_all_note)
             .service(create_note)
             .service(read_all_note)
-            .service(read_note)
             .service(update_note)
             .service(delete_note)
             .service(all_categories)
