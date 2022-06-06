@@ -1,4 +1,4 @@
-use actix_web::{get, post, put, delete, web, error::ErrorNotFound, Error, HttpResponse, http::StatusCode};
+use actix_web::{get, post, put, delete, web, error::{ErrorNotFound, ErrorBadRequest}, Error, HttpResponse, http::StatusCode};
 use anyhow::Result;
 use sqlx::SqlitePool;
 use crate::note::{Note, NewNote};
@@ -10,28 +10,26 @@ pub async fn root() -> Result<HttpResponse, Error>{
     Ok(HttpResponse::build(StatusCode::OK).body("Hello world, Rust!"))
 }
 
- #[get("/notes}")]
- pub async fn read_all_note(pool: web::Data<SqlitePool>)->Result<HttpResponse, Error>{
-     println!("=== Aqui ===");
-     Note::all(pool)
+#[get("/notes")]
+pub async fn all_notes(pool: web::Data<SqlitePool>)->Result<HttpResponse, Error>{
+    Note::all(pool)
         .await
         .map(|some_notes| HttpResponse::Ok().json(some_notes))
-        .map_err(|_| ErrorNotFound("Not found"))
-}
-
-//#[get("/notes/{note_id}")]
-pub async fn read_note(pool: web::Data<SqlitePool>, path: web::Path<i64>)->Result<HttpResponse, Error>{
-    let note_id = path.into_inner();
-    println!("=== {} ===", note_id);
-    Note::get(pool, note_id)
-       .await
-       .map(|note| HttpResponse::Ok().json(note))
-       .map_err(|_| ErrorNotFound("Not found"))
+        .map_err(|_| ErrorBadRequest("Not found"))
 }
 
 #[post("/notes")]
 pub async fn create_note(pool: web::Data<SqlitePool>, data: web::Json<NewNote>) -> Result<HttpResponse, Error>{
     Note::new(pool, &data.into_inner().title, None)
+       .await
+       .map(|note| HttpResponse::Ok().json(note))
+       .map_err(|_| ErrorNotFound("Not found"))
+}
+
+#[get("/notes/{note_id}")]
+pub async fn read_note(pool: web::Data<SqlitePool>, path: web::Path<i64>)->Result<HttpResponse, Error>{
+    let note_id = path.into_inner();
+    Note::get(pool, note_id)
        .await
        .map(|note| HttpResponse::Ok().json(note))
        .map_err(|_| ErrorNotFound("Not found"))
