@@ -36,5 +36,21 @@ impl Category{
             .last_insert_rowid();
         Self::get(pool, id).await
     }
-}
 
+    pub async fn update(pool: web::Data<SqlitePool>, category: Category) -> Result<Category, Error>{
+        query("UPDATE categories SET name=? WHERE id=?;")
+            .bind(label.name)
+            .bind(label.id)
+            .execute(pool.get_ref())
+            .await?;
+        Self::get(pool, label.id).await
+    }
+
+    pub async fn delete(pool: web::Data<SqlitePool>, id: i64) -> Result<String, Error>{
+        query("DELETE FROM categories WHERE id = ?;")
+            .bind(id)
+            .execute(pool.get_ref())
+            .await;
+        Ok("Category deleted".to_string())
+    }
+}

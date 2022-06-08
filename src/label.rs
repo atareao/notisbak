@@ -38,5 +38,22 @@ impl Label{
             .last_insert_rowid();
         Self::get(pool, id).await
     }
+
+    pub async fn update(pool: web::Data<SqlitePool>, label: Label) -> Result<Label, Error>{
+        query("UPDATE labels SET name=? WHERE id=?;")
+            .bind(label.name)
+            .bind(label.id)
+            .execute(pool.get_ref())
+            .await?;
+        Self::get(pool, label.id).await
+    }
+
+    pub async fn delete(pool: web::Data<SqlitePool>, id: i64) -> Result<String, Error>{
+        query("DELETE FROM labels WHERE id = ?;")
+            .bind(id)
+            .execute(pool.get_ref())
+            .await;
+        Ok("Label deleted".to_string())
+    }
 }
 
