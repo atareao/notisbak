@@ -1,7 +1,8 @@
 use actix_web::web;
 use chrono::{NaiveDateTime, Utc};
-use sqlx::{sqlite::SqlitePool, query, query_as, FromRow, Error};
+use sqlx::{sqlite::{SqlitePool, SqliteQueryResult}, query, query_as, FromRow, Error};
 use serde::{Serialize, Deserialize};
+use crate::label::Label;
 
 #[derive(Debug, FromRow, Serialize, Deserialize)]
 pub struct Note{
@@ -64,7 +65,37 @@ impl Note{
         query("DELETE FROM notes WHERE id = ?;")
             .bind(id)
             .execute(pool.get_ref())
-            .await;
+            .await?;
         Ok("Note deleted".to_string())
+    }
+
+    pub async fn add_label(self, pool: web::Data<SqlitePool>, label_id: i64) -> Result<SqliteQueryResult, Error>{
+        query("INSERT INTO notes_labels (note_id, label_id) VALUES (?, ?);")
+            .bind(self.id)
+            .bind(label_id)
+            .execute(pool.get_ref())
+            .await
+    }
+
+    pub async fn delete_label(self, pool: web::Data<SqlitePool>, label_id: i64) -> Result<SqliteQueryResult, Error>{
+        query("DELETE FROM notes_labels WHERE node_id = ?, label_id = ?")
+            .bind(self.id)
+            .bind(label_id)
+            .execute(pool.get_ref())
+            .await
+    }
+
+    pub async fn get_labels(self, pool: web::Data<SqlitePool>) -> Result<Vec<Label>, Error>{
+        let labels = query_as!(Label, r#"SELECT l.id, l.name FROM labels l INNER JOIN notes_labels nl ON l.id = nl.label_id AND nl.note_id = ?"#, self.id)
+            .fetch_all(pool.get_ref())
+            .await?;
+        Ok(labels)
+    }
+
+    pub async fn get_label(self, pool: web::Data<SqlitePool>, label_id: i64) -> Result<Label, Error>{
+        let label = query_as!(Label, r#"SELECT id, name FROM labels WHERE id = ?"#, self.id)
+            .fetch_one(pool.get_ref())
+            .await?;
+        Ok(label)
     }
 }

@@ -39,11 +39,11 @@ impl Category{
 
     pub async fn update(pool: web::Data<SqlitePool>, category: Category) -> Result<Category, Error>{
         query("UPDATE categories SET name=? WHERE id=?;")
-            .bind(label.name)
-            .bind(label.id)
+            .bind(category.name)
+            .bind(category.id)
             .execute(pool.get_ref())
             .await?;
-        Self::get(pool, label.id).await
+        Self::get(pool, category.id).await
     }
 
     pub async fn delete(pool: web::Data<SqlitePool>, id: i64) -> Result<String, Error>{
