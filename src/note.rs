@@ -3,8 +3,11 @@ use chrono::{NaiveDateTime, Utc};
 use sqlx::{sqlite::{SqlitePool, SqliteQueryResult}, query, query_as, FromRow, Error};
 use serde::{Serialize, Deserialize};
 use crate::label::Label;
+use utoipa::Component;
 
-#[derive(Debug, FromRow, Serialize, Deserialize)]
+//https://github.com/juhaku/utoipa
+
+#[derive(Debug, FromRow, Serialize, Deserialize, Component)]
 pub struct Note{
     pub id: i64,
     pub title: String,
@@ -16,6 +19,32 @@ pub struct Note{
 #[derive(Debug, FromRow, Serialize, Deserialize)]
 pub struct NewNote{
     pub title: String,
+}
+
+mod note_api{
+    use crate::note::Note;
+
+    #[utoipa::path(
+        get,
+        path = "/notes/{id}",
+        responses(
+            (status = 200, description = "Note found succesfully", body = Note),
+            (status = 404, description = "Note was not found")
+        ),
+        params(
+            ("id" = i64, path, description = "Note database id to get Note for"),
+        )
+    )]
+    async fn get_note_by_id(note_id: i64) -> Note {
+        let current = chrono::Utc::now().naive_utc();
+        Note {
+            id: note_id,
+            title: "Sample title".to_string(),
+            body: "Sample body".to_string(),
+            created_at: current,
+            updated_at: current,
+        }
+    }
 }
 
 impl Note{
