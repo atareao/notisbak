@@ -36,7 +36,7 @@ async fn main() -> std::io::Result<()> {
             .service(all_labels)
             .service(new_label)
     })
-    .bind("127.0.0.1:8080")
+    .bind("127.0.0.1:4040")
     .unwrap()
     .run()
     .await
